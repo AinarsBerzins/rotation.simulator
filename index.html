@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Rotation simulator</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="//cdn.rawgit.com/mrdoob/three.js/master/build/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/controls/DragControls.js"></script>
+  <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+  <script src="GLTFLoader.js"> </script>
+  <script>
+
+    var camera, scene, renderer, controls;
+    var cubes = [];
+    var drag_obj = [];
+    var links = [];
+    var dragControls;
+
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.set(1, 1, 1).setLength(15);
+    camera.lookAt(scene.position);
+
+
+
+
+
+    scene.background = new THREE.Color(0xcccccc); //color background
+    // hlight = new THREE.AmbientLight (0x404040,100);
+    // scene.add(hlight);
+
+    renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    var plane = new THREE.GridHelper(20, 20);// grids lai labāk orentētos
+    scene.add(plane);
+
+
+
+
+
+    //   let loader = new THREE.GLTFLoader();
+    //   loader.load('scene.gltf', function(gltf){
+    //   food = gltf.scene.children[0];
+    //   food.scale.set(15,15,15);//size of obj
+    //   scene.add(gltf.scene);
+    //   renderer.render(scene,camera);
+    // });
+    //
+    ////MUZIKA SĀKAS TAD, ja ieladējot lapu uzreiz pakustina kameru or noklikšķina peli
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+    const audioLoader = new THREE.AudioLoader();
+    const backgroundSound = new THREE.Audio(listener);
+    //C:\Users\aleks\OneDrive\Dators\for_grafiska
+    audioLoader.load('../sound/music2.mp3', function (buffer) {
+      backgroundSound.setBuffer(buffer);
+      backgroundSound.setLoop(true);
+      backgroundSound.setVolume(0.5);
+      backgroundSound.play();
+    });
+
+
+    //ja ir šādi, tad, kaste ir normāli kā vajag
+    // var red = createCube("red", -5, 0, -5);
+    // var orange = createCube("orange", 0, 0, -5 );
+    // var blue = createCube("blue", 5, 0, -5);
+
+    //ja ir šitā, tad kas ir uz sāna
+    var red = createCube("red", -5, 0, 5);
+    var orange = createCube("orange", -5, 0, -5);
+    var blue = createCube("blue", 5, 0, -5);
+
+    //   directionalLight = new THREE.DirectionalLight(0xffffff,100);
+    //   directionalLight.position.set(0,1,0);
+    //   directionalLight.castShow = true;
+    //   scene.add(directionalLight);
+
+    //   light = new THREE.PointLight(0xc4c4c4,10);
+    //   light.position.set(0,30,50);
+    //   scene.add(light);
+
+    //   light2 = new THREE.PointLight(0xc4c4c4,10);
+    //   light2.position.set(50,10,0);
+    //   scene.add(light2);
+
+    //   light3 = new THREE.PointLight(0xc4c4c4,10);
+    //   light3.position.set(0,10,-50);
+    //   scene.add(light3);
+
+    //   light4 = new THREE.PointLight(0xc4c4c4,10);
+    //   light4.position.set(-50,30,0);
+    //   scene.add(light4);
+
+    //   let loader = new THREE.GLTFLoader();
+    //   loader.load('scene.gltf', function(gltf){
+    //   food = gltf.scene.children[0];
+    //   food.scale.set(15,15,15);//size of obj
+    //   scene.add(gltf.scene);
+    //   renderer.render(scene,camera);
+    // });
+    //var sun = ("green", 0, 0, 0);
+
+    // var cubegeom = new THREE.BoxGeometry(1, 1, 1);
+    // var cube = new THREE.Mesh(cubegeom, new THREE.MeshBasicMaterial({
+    //   color: color
+    // }));
+
+
+
+    //NAV NE JAUSMAS, KĀDĒĻ KASTE IR SĀNISKI, TUR IR KAUT KĀDS GĻUKS
+    var loader = new THREE.GLTFLoader();
+    //var sun;
+
+    var sunG = new THREE.BoxGeometry(1, 1, 1);
+    var sun = new THREE.Mesh(sunG);
+    loader.load("scene.gltf", function (gltf) {
+      sun = gltf.scene.children[0];
+      sun.scale.set(0.05, 0.05, 0.05);//size of obj
+      // var meal = food;
+      sun.position.set(0, 0, 0);//pozicija uz plaknes
+      scene.add(sun);
+    });
+
+    var light = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
+    //light.position.set(5, 0, -5);
+    scene.add(light);
+
+
+
+
+    // var sunG = new THREE.BoxGeometry(1, 1, 1);
+    // // var cube = new THREE.Mesh(sunG, new THREE.MeshBasicMaterial({
+    // //     color: "green",
+    // //   }));
+    // //         //var texture = loader.load("2k_sun.jpg");
+    //         var sun = new THREE.Mesh(sunG);
+    //         sun.position.set(0, 0, 0);
+    //         scene.add(sun);
+
+
+
+
+    // const tempred = new THREE.Vector3();
+    //         red.getWorldPosition(tempred);
+    //         const temporange = new THREE.Vector3();
+    //         orange.getWorldPosition(temporange);
+    //         const tempblue = new THREE.Vector3();
+    //         blue.getWorldPosition(tempblue);
+    //         const tempSun = new THREE.Vector3();
+    //         sun.getWorldPosition(tempSun);
+
+    //         var dir1 = new THREE.Vector3();
+    //         dir1.subVectors(tempred, temporange);
+    //         var dir2 = new THREE.Vector3();
+    //         dir2.subVectors(tempblue, temporange);
+    //         var dir3 = new THREE.Vector3();
+    //         dir3.multiplyVectors(dir1, dir2);
+
+    //         var dir3Quater = new THREE.Quaternion();
+    //         dir3Quater.setFromAxisAngle(dir3, Math.PI / 2);
+    //         dir3.applyQuaternion(dir3Quater);
+
+    //         var sunQuater = new THREE.Quaternion();
+    //         sunQuater.setFromAxisAngle(tempSun, Math.PI / 2);
+    //         tempSun.applyQuaternion(sunQuater);
+
+
+    //scene.matrixAutoupdate = false;
+    init();
+    animate();
+
+    function init() {
+      dragControls = new THREE.DragControls(drag_obj, camera, renderer.domElement);
+      dragControls.transformRoot = true;
+      dragControls.addEventListener('dragstart', function (event) {
+        controls.enabled = false;
+      });
+      dragControls.addEventListener('dragend', function (event) {
+        controls.enabled = true;
+      });
+
+
+    }
+    function createCube(color, x, y, z) {
+      var cubegeom = new THREE.BoxGeometry(1, 1, 1);
+      //var edgeGeo = new THREE.EdgesGeometry(cubegeom);
+      //    let material = new THREE.LineBasicMaterial({
+      //     color: color,
+      //     linewidth: 1
+      // });
+      //let lines_mesh = new THREE.LineSegments(edgeGeo, material);
+      var cube = new THREE.Mesh(cubegeom, new THREE.MeshBasicMaterial({
+        color: color
+      }));
+      //cube.add(lines_mesh);
+      setRandomPosition(cube, x, y, z);
+      scene.add(cube);
+      cubes.push(cube);
+      return cube;
+    }
+    var raycaster, mouse = { x: 0, y: 0 };
+    raycaster = new THREE.Raycaster();
+    window.addEventListener('mousedown', raycast, false);
+    var INTERSECTED;
+
+    function setRandomPosition(obj, x, y, z) {
+      obj.position.set(x, y, z);
+
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      render();
+      const tempred = new THREE.Vector3();
+      red.getWorldPosition(tempred);
+      const temporange = new THREE.Vector3();
+      orange.getWorldPosition(temporange);
+      const tempblue = new THREE.Vector3();
+      blue.getWorldPosition(tempblue);
+      const tempSun = new THREE.Vector3();
+      sun.getWorldPosition(tempSun);
+
+      var dir1 = new THREE.Vector3();
+      dir1.subVectors(temporange, tempred);
+      var dir2 = new THREE.Vector3();
+      dir2.subVectors(temporange, tempblue);
+      var dir3 = new THREE.Vector3();
+      var dir2Scale = dir2.length() / 100;
+      //dir3.multiplyVectors(dir1, dir2);
+      dir3.crossVectors(dir1, dir2).normalize();
+
+      var dir3Quater = new THREE.Quaternion();
+      dir3Quater.setFromAxisAngle(dir3, Math.PI / 1);
+      sun.scale.set(dir2Scale, dir2Scale, dir2Scale)
+      //dir3.applyQuaternion(dir3Quater);
+
+      //var sunQuater = new THREE.Quaternion();
+      //sunQuater.setFromAxisAngle(tempSun, Math.PI / 2);
+     // tempSun.applyQuaternion(sunQuater);
+     // rotObjectMatrix = new THREE.Matrix4();
+      //rotObjectMatrix.makeRotationFromQuaternion(dir3Quater);
+      //sun.quaternion.setFromRotationMatrix(rotObjectMatrix);
+      //sun.quaternion.set(dir3Quater.x, dir3Quater.y, dir3Quater.z, dir3Quater.w);
+      sun.rotation.setFromQuaternion(dir3Quater);
+      //pievienot skalāro matricu
+      console.log(dir1, dir2, dir3);
+    }
+
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    function raycast(e) {
+      drag_obj.length = 0;
+      var canvasBounds = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
+      mouse.y = - ((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      intersects = raycaster.intersectObjects(cubes);
+      if (intersects.length > 0) {
+        INTERSECTED = intersects[0].object;
+        drag_obj.push(INTERSECTED);
+        // }
+      }
+      dragControls.removeEventListener('dragstart', function (event) {
+        controls.enabled = false;
+      });
+      dragControls.removeEventListener('dragend', function (event) {
+        controls.enabled = true;
+      });
+      init();
+    }
+  </script>
+</body>
+
+</html>
